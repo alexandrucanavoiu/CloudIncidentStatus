@@ -62,8 +62,8 @@
 <script src="/authentication/plugins/respond.min.js"></script>
 <script src="/authentication/js/custom.js"></script>
 <script src="/authentication/js/select2.full.min.js"></script>
-<script src="/vendor/unisharp/laravel-ckeditor/ckeditor.js"></script>
-<script src="/vendor/unisharp/laravel-ckeditor/adapters/jquery.js"></script>
+<script src="/authentication/plugins/laravel-ckeditor/ckeditor.js"></script>
+<script src="/authentication/plugins/laravel-ckeditor/adapters/jquery.js"></script>
 <script src="/authentication/js/jquery.sparkline.min.js"></script>
 <script src="/authentication/js/jquery.slimscroll.min.js"></script>
 <script src="/authentication/plugins/morris.js/morris.min.js"></script>
