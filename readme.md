@@ -55,8 +55,7 @@ If you don't have an external VPS, you can buy one from [Webland.ro](https://web
 ###### Step 1
 ```sh
 $ cd /home/statuspage/
-$ git clone https://github.com/alexandrucanavoiu/CloudIncidentStatus
-$ cd CloudIncidentStatus
+$ git clone https://github.com/alexandrucanavoiu/CloudIncidentStatus .
 ```
 
 ###### Step 2
@@ -86,12 +85,12 @@ $ php artisan db:seed --class=Footer
 ```
 
 ###### Step 6
-You need to run Queue in background. This will be used for Subscriber Emails when an Incident or Maintenance is created.
+You need to run Queue in background (See the command "screen" from linux). This will be used for Subscriber Emails when an Incident or Maintenance is created.
 ```sh
 $ php artisan queue:work --queue=Incidents,Maintenance --tries=1
 ````
 
-###### Step 5
+###### Step 7
 ````
 Admin page: www.yourdomain.org/login
 username: demo@example.org
