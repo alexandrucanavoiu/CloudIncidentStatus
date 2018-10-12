@@ -47,6 +47,9 @@ Build customer trust with this tool. Allow them to know when an incident occurs 
 - Mysql
 - Composer (http://www.getcomposer.org)
 
+If you don't have an external VPS, you can buy one from [Webland.ro](https://webland.ro) and managed with [ClusterCS.com](https://clustercs.com).
+
+
 ## How to install
 
 ###### Step 1
@@ -62,12 +65,18 @@ You will change the default values with your own (like database name, database u
 
 ###### Step 3
 ```sh
-$ php artisan key:generate
+$ find ./ -type f -exec chmod 644 {} +
+$ find ./ -type d -exec chmod 755 {} +
 ```
 
 ###### Step 4
 ```sh
-$ php composer update
+$ composer update
+$ php artisan key:generate
+```
+
+###### Step 5
+```sh
 $ php artisan migrate
 $ php artisan db:seed --class=Settings
 $ php artisan db:seed --class=ComponentStatuses
@@ -76,8 +85,8 @@ $ php artisan db:seed --class=IncidentStatus
 $ php artisan db:seed --class=Footer
 ```
 
-###### Step 5
-You need to run Queue in background (use screen in linux). This will be used for Subscriber Emails when an Incident or Maintenance is created.
+###### Step 6
+You need to run Queue in background. This will be used for Subscriber Emails when an Incident or Maintenance is created.
 ```sh
 $ php artisan queue:work --queue=Incidents,Maintenance --tries=1
 ````
