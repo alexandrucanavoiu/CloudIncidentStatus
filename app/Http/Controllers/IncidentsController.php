@@ -123,10 +123,8 @@ class IncidentsController extends Controller
                     ['user_id' => $user->id, 'incidents_id' => $incident_id, 'incident_statuses_id' => $incident_statuses_id, 'component_statuses_id' => $component_statuses_id, 'incidents_description' => $incidents_description, 'created_at' => $created_at, 'updated_at' => $updated_at]
                 );
 
-
                 // Array from ajax components_id
                 $IncidentComponentsArray = [];
-
 
                 foreach ($components_id as $component_insert)
                 {
@@ -139,21 +137,19 @@ class IncidentsController extends Controller
 
                 // Insert components in db
                 $incidentComponents->create($IncidentComponentsArray);
-
-
                 $incident_inserted = Incident::where('id', $incident_id)->get()->first();
                 $incidents_count = Incident::get()->count();
-
                 $get_the_incident_components_inserted = IncidentComponents::with('component_name')->where('incidents_id', $incident_id)->get();
 
                 $component_name_list = [];
 
                 foreach ($get_the_incident_components_inserted as $item){
                     $component_name_list[] = $item->component_name->component_name;
+                    $get_the_biggest_status_of_component = IncidentComponents::where('components_id', $item->components_id)->OrderBy('component_statuses_id', 'DESC')->get()->first();
+                    Components::where('id', $item->components_id)->update(['component_statuses_id' => $get_the_biggest_status_of_component->component_statuses_id]);
                 }
 
                 $component_name = implode(', ', $component_name_list);
-
                 $incident_status_name = $incident_inserted->incident_status->incident_name;
                 $incident_date_update = $incident_inserted->updated_at->format('d/m/Y H:i:s');
 
@@ -286,6 +282,8 @@ class IncidentsController extends Controller
             $component_name = [];
 
             foreach ($get_the_incident_components_inserted as $item){
+                $get_last_incident_with_same_component = IncidentComponents::where('components_id', $item->components_id)->OrderBy('component_statuses_id', 'DESC')->get()->first();
+                Components::where('id', $get_last_incident_with_same_component->components_id)->update(['component_statuses_id' => $get_last_incident_with_same_component->component_statuses_id]);
                 $component_name[] = $item->component_name->component_name;
             }
 
@@ -308,18 +306,25 @@ class IncidentsController extends Controller
 
         if ( $request->ajax() ) {
 
+            $get_the_list_of_component = IncidentComponents::where('incidents_id', $incident->id)->get();
+
             Incident::where('id', $id)->delete();
             IncidentComponents::where('incidents_id', $id)->delete();
             $check_count_incidents_list = Incident::get()->count();
 
-            $check_if_component_have_incidents = Incident::where('components_id', $incident->components_id)->OrderBy('components_id', 'DESC')->get();
-
-            if($check_if_component_have_incidents->count() > 0){
-                Components::where('id', $incident->components_id)->update(['component_statuses_id' => $check_if_component_have_incidents[0]['component_statuses_id']]);
-            } else {
-                Components::where('id', $incident->components_id)->update(['component_statuses_id' => 1]);
+            foreach ($get_the_list_of_component as $item){
+                $component_id = $item->components_id;
+                $check_the_component_in_incident_components = IncidentComponents::where('components_id', $component_id)->OrderBy('component_statuses_id', 'DESC')->get()->first();
+                if(!empty($check_the_component_in_incident_components)){
+                    if($check_the_component_in_incident_components->count() > 0){
+                        Components::where('id', $component_id)->update(['component_statuses_id' => $check_the_component_in_incident_components->component_statuses_id]);
+                    } else {
+                        Components::where('id', $component_id)->update(['component_statuses_id' => 1]);
+                    }
+                } else {
+                    Components::where('id', $component_id)->update(['component_statuses_id' => 1]);
+                }
             }
-
             return response()->json(['check_count_incidents_list' => $check_count_incidents_list, 'success' => 'Great! The incident has been removed!']);
         } else {
             $notification = array(
@@ -497,7 +502,7 @@ class IncidentsController extends Controller
 
                 $get_components_incident = IncidentComponents::with('component_name')->where('incidents_id', $incident->id)->get();
 
-                // add components in an array for dispatch
+                // add components in an array for dispatch & update status of components
                 $components_for_incident_id = [];
                 $components_for_incident_name = [];
 

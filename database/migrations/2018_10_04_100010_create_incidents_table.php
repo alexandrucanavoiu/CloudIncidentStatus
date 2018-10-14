@@ -18,7 +18,6 @@ class CreateIncidentsTable extends Migration
             $table->string('code');
             $table->unsignedInteger('user_id');
             $table->string('incident_title');
-            $table->integer('components_id')->nullable();
             $table->integer('incident_statuses_id');
             $table->integer('component_statuses_id');
             $table->integer('incidents_status');
